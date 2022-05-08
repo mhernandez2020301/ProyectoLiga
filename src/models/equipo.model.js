@@ -5,7 +5,7 @@ var EquipoSchema = Schema ({
     nombre: String,
     golesF: Number,
     golesC: Number,
-    Diferencia: Number,
+    golesD: Number,
     partidosJugados: Number,
     puntos: Number,
     idUsuario: {type: Schema.Types.ObjectId, ref: 'Usuarios'},
