@@ -3,11 +3,9 @@ var Schema = mongoose.Schema;
 
 var UsuarioSchema = Schema ({
     nombre: String,
-    apellido: String,
     username: String,
     password: String,
-    rol: String,
-    email: String,
+    rol: String
 })
 
 module.exports = mongoose.model("Usuario", UsuarioSchema);

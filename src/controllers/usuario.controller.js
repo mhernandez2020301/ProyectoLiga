@@ -2,36 +2,57 @@ const Usuario = require('../models/usuario.model');
 const bcrypt = require('bcrypt-nodejs');
 const jwt = require('../services/jwt.js');
 
+//CREATE 
 
 function Registrar(req, res) {
     var parametros = req.body;
     var usuarioModel = new Usuario();
-    if (parametros.nombre && parametros.apellido &&
-        parametros.email && parametros.password) {
+    if (parametros.nombre && parametros.username && parametros.password) {
         usuarioModel.nombre = parametros.nombre;
-        usuarioModel.apellido = parametros.apellido;
-        usuarioMode.username = parametros.username;
+        usuarioModel.username = parametros.username;
         usuarioModel.rol = 'USUARIO';
-        usuarioModel.imagen = null;
-
         Usuario.find({ username: parametros.username }, (err, usuarioEncontrado) => {
             if (usuarioEncontrado.length <= 0) {
-
                 bcrypt.hash(parametros.password, null, null, (err, passwordEncriptada) => {
                     usuarioModel.password = passwordEncriptada;
-
                     usuarioModel.save((err, usuarioGuardado) => {
                         if (err) return res.status(500)
-                            .send({ mensaje: 'Error en la peticion' });
+                            .send({ mensaje: 'Error en la petición :/' });
                         if (!usuarioGuardado) return res.status(500)
-                            .send({ mensaje: 'Error al agregar el Usuario' });
-
+                            .send({ mensaje: 'Error al agregar el Usuario :(' });
                         return res.status(200).send({ usuario: usuarioGuardado });
                     });
                 });
             } else {
                 return res.status(500)
-                    .send({ mensaje: 'Este usuario, ya  se encuentra utilizado' });
+                    .send({ mensaje: 'Este usuario, ya  se encuentra utilizado :c' });
+            }
+        })
+    }
+}
+
+function RegistrarAdmin(req, res) {
+    var parametros = req.body;
+    var usuarioModel = new Usuario();
+    if (parametros.nombre && parametros.username && parametros.password) {
+        usuarioModel.nombre = parametros.nombre;
+        usuarioModel.username = parametros.username;
+        usuarioModel.rol = 'ADMIN';
+        Usuario.find({ username: parametros.username }, (err, usuarioEncontrado) => {
+            if (usuarioEncontrado.length <= 0) {
+                bcrypt.hash(parametros.password, null, null, (err, passwordEncriptada) => {
+                    usuarioModel.password = passwordEncriptada;
+                    usuarioModel.save((err, usuarioGuardado) => {
+                        if (err) return res.status(500)
+                            .send({ mensaje: 'Error en la petición :/' });
+                        if (!usuarioGuardado) return res.status(500)
+                            .send({ mensaje: 'Error al agregar el Usuario :(' });
+                        return res.status(200).send({ usuario: usuarioGuardado });
+                    });
+                });
+            } else {
+                return res.status(500)
+                    .send({ mensaje: 'Este usuario, ya  se encuentra utilizado :c' });
             }
         })
     }
@@ -40,7 +61,6 @@ function Registrar(req, res) {
 function RegistrarAdminDefault(){
     var usuarioModel =  new Usuario();
     usuarioModel.nombre = 'ADMIN';
-    usuarioModel.apellido = 'ADMIN';
     usuarioModel.username = 'ADMIN';
     usuarioModel.password = '123456';
     usuarioModel.rol= 'ADMIN';
@@ -51,23 +71,21 @@ function RegistrarAdminDefault(){
                 usuarioModel.password = passwordEncriptada;
                 usuarioModel.save((err, usuarioGuardado)=>{
 
-                    if(err) return console.log('error en la peticion')
+                    if(err) return console.log('Error en la petición :/')
                      if(usuarioGuardado){
-                        console.log('admin creado');
+                        console.log('ADMIN CREADO EXITOSAMENTE :D');
                      }else{
-                         console.log('no se creo el admin ')
+                         console.log('Error al agregar el ADMIN :(')
                      }
                 });
             })
 
         }else{
-            return console.log('el admin ya esta registrado uwu');
+            return console.log('Admin registrado correctamente :D');
         }
 
     })
-
 }
-
 
 function Login(req, res) {
     var parametros = req.body;
@@ -88,8 +106,6 @@ function Login(req, res) {
                             return res.status(200)
                                 .send({ usuario: usuarioEncontrado })
                         }
-
-
                     } else {
                         return res.status(500)
                             .send({ mensaje: 'Las contrasena no coincide' });
@@ -103,11 +119,12 @@ function Login(req, res) {
     })
 }
 
+//EDIT 
+
 function Editar(req, res){
     var idUser = req.params.idUsuario;
     var parametros = req.body;
 
-    // BORRAR LA PROPIEDAD DE PASSWORD EN EL BODY
     delete parametros.password
 
     Usuario.findByIdAndUpdate(idUser, parametros, {new: true}, (err, usuarioEditado)=>{
@@ -118,6 +135,8 @@ function Editar(req, res){
     })
 
 }
+
+//DELETE 
 
 function Eliminar (req, res){
     var idUser = req.params.idUsuario;
@@ -134,6 +153,8 @@ function Eliminar (req, res){
     })
 }
 
+//GET
+
 function Obtener(req, res) {
     Usuario.find({}).exec((err, usuariosEncontrados)=>{
         if(err) return res.status(500).send({message: "Error al encontrar los Usuarios"});
@@ -146,8 +167,10 @@ function Obtener(req, res) {
         }
     })
 }
+
 module.exports = {
     Registrar,
+    RegistrarAdmin,
     RegistrarAdminDefault,
     Editar,
     Login,
